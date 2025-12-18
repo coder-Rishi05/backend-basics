@@ -38,3 +38,6 @@ server res to user
 
 uri=        
 
+express : create server
+
+mongoose : talk to backend
