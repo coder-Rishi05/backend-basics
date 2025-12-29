@@ -1,10 +1,5 @@
 import express from "express";
-const app = express();
+const app = express(); 
 
-app.get("/", (req, res) => {
-  res.status(200).send("Hello from backend");
-});
+export default app;
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
