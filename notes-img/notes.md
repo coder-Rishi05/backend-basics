@@ -119,7 +119,65 @@ const startServer = async () => {
 startServer();
 ````
 
-```
-```
-
+---
 --- 
+
+### Creating API's and login logout entity relations
+
+Model : code version of structure of the data that we want in our website. basically how we want to represent data in website.
+- they define schemas
+
+
+![alt text](./image4.png)
+
+entity relation
+
+Users : for authentication.
+
+post : its for character we can post on websites.
+
+Schema : structure
+
+- it show what kind of data on our system
+- how they are relate to each other 
+
+userModel
+
+```js
+import mongoose, { Schema } from "mongoose";
+
+const userSchema = new Schema(
+  {
+    userName: {
+      type: "String",
+      required: true,
+      unique: true,
+      lowerCase: true,
+      trim: true, //
+      minLength: 3,
+      maxLength: 30,
+    },
+    password: {
+      type: "String",
+      required: true,
+      minLength: 6,
+      maxLength: 30,
+    },
+    email: {
+      type: "String",
+      required: true,
+      unique: true,
+      lowerCase: true,
+      trim: true, //
+    },
+  },
+  { timestamps: true }
+);
+
+export const User = mongoose.model("User", userSchema);
+
+```
+### Routes
+
+
+
