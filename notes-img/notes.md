@@ -185,3 +185,6 @@ export const User = mongoose.model("User", userSchema);
 they are the decision makers handle requests
 
 
+### req flow
+
+![alt text](image-1.png)
