@@ -180,4 +180,8 @@ export const User = mongoose.model("User", userSchema);
 ### Routes
 
 
+### Controller
+
+they are the decision makers handle requests
+
 
