@@ -179,4 +179,28 @@ const loginUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser };
+const logoutUser = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({
+      email,
+    });
+    if (!email)
+      return res.status(404).json({
+        message: "user does not exist",
+      });
+
+    //
+    res.status(200).json({
+      message: "User logout sucessfully",
+    });
+  } catch (error) {
+    console.log("Server error : ", error);
+    return res.status(500).json({
+      message: "getting server error",
+    });
+  }
+};
+
+export { registerUser, loginUser,logoutUser };

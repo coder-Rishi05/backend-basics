@@ -253,7 +253,6 @@ https: protocol
 ```js
 const loginUser = async (req, res) => {
   try {
-
     const { email, password } = req.body;
     // check user already exist
 
@@ -261,19 +260,236 @@ const loginUser = async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User does not exist" });
     // checking validation
-    
-    return res.status(200).json({ message: "user logged in successfully" });
 
+    return res.status(200).json({ message: "user logged in successfully" });
   } catch (error) {
     console.log("Error in user login : ", error);
     return res.status(501).json({ message: "Error in user login" });
   }
 };
-
-
 ```
-
 
 ### bcrypt
 
 it is used to hash password and compare password
+our password must be hashed before saving in database for that we use bcrypt
+
+```js
+import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+      maxlength: 30,
+      select: false, // IMPORTANT
+    },
+  },
+  { timestamps: true }
+);
+
+// Hash password before saving
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+// Compare password
+userSchema.methods.comparePassword = function (password) {
+  return bcrypt.compare(password, this.password);
+};
+
+export const User = mongoose.model("User", userSchema);
+```
+
+- Updating the routes according to schema for register and user login
+
+### user.controller.js
+
+```js
+import { User } from "../models/user.model.js";
+
+const registerUser = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    // Basic validation
+    if (!username || !email || !password) {
+      return res.status(400).json({
+        message: "All fields are mandatory",
+      });
+    }
+
+    // Check if email already exists
+    const existingUser = await User.findOne({
+      email: email.toLowerCase(),
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists",
+      });
+    }
+
+    // Create user
+    const user = await User.create({
+      username,
+      email: email.toLowerCase(),
+      password,
+    });
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    // Duplicate key error (email or username)
+    if (err.code === 11000) {
+      return res.status(400).json({
+        message: "Email or username already exists",
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+      });
+    }
+
+    // Find user and include password
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+    }).select("+password");
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User does not exist",
+      });
+    }
+
+    // Compare password
+    const isMatch = await user.comparePassword(password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Credentials do not match",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User logged in successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Error in user login:", error);
+    return res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+export { registerUser, loginUser };
+```
+
+---
+
+- user session and Jwt
+
+when we the user login on a website we create a session for them like for how long user should be logged in and after how much time later user will logout.
+
+after that time interval user will be logout it self. and he will have to login again.
+
+### logout api
+
+if user want to logout by own
+
+```js
+const logoutUser = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({
+      email,
+    });
+    if (!email)
+      return res.status(404).json({
+        message: "user does not exist",
+      });
+
+    //
+    res.status(200).json({
+      message: "User logout sucessfully",
+    });
+  } catch (error) {
+    console.log("Server error : ", error);
+    return res.status(500).json({
+      message: "getting server error",
+    });
+  }
+};
+
+export { registerUser, loginUser, logoutUser };
+```
+
+- useroutes.js
+
+```js
+import { Router } from "express";
+import {
+  registerUser,
+  loginUser,
+  logoutUser,
+} from "../controllers/user.controller.js";
+const router = Router();
+
+router.route("/register").post(registerUser);
+
+router.route("/login").post(loginUser);
+
+router.route("/logout").post(logoutUser);
+
+export default router;
+```
+
+
