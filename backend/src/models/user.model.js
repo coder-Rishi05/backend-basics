@@ -2,26 +2,26 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
   {
-    userName: {
-      type: "String",
+    username: {
+      type: String,
       required: true,
       unique: true,
-      lowerCase: true,
+      lowercase: true,
       trim: true, //
       minLength: 3,
       maxLength: 30,
     },
     password: {
-      type: "String",
+      type: String,
       required: true,
       minLength: 6,
       maxLength: 30,
-    },
+    },  
     email: {
       type: "String",
       required: true,
       unique: true,
-      lowerCase: true,
+      lowercase: true,
       trim: true, //
     },
   },

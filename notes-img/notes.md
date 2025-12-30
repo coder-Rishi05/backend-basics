@@ -120,13 +120,14 @@ startServer();
 ````
 
 ---
---- 
+
+---
 
 ### Creating API's and login logout entity relations
 
 Model : code version of structure of the data that we want in our website. basically how we want to represent data in website.
-- they define schemas
 
+- they define schemas
 
 ![alt text](./image4.png)
 
@@ -139,7 +140,7 @@ post : its for character we can post on websites.
 Schema : structure
 
 - it show what kind of data on our system
-- how they are relate to each other 
+- how they are relate to each other
 
 userModel
 
@@ -175,16 +176,87 @@ const userSchema = new Schema(
 );
 
 export const User = mongoose.model("User", userSchema);
-
 ```
+
 ### Routes
 
+```js
+// user.routes.js
+import { Router } from "express";
+import { registerUser } from "../controllers/user.controller";
+const router = Router();
+
+router.route("/register").post(registerUser);
+
+export default router;
+```
 
 ### Controller
 
 they are the decision makers handle requests
 
+```js
+import { User } from "../models/user.model.js";
+
+const registerUser = async (req, res) => {
+  try {
+    const { userName, email, password } = req.body;
+
+    // basic validation
+
+    if (!userName || !email || !password) {
+      return res.status(400).json({ message: "All the feild are mandatory !" });
+    }
+
+    // if user already exist
+
+    const existingUser = User.findOne({ email: email.toLowerCase() });
+
+    if (existingUser)
+      return res.status(400).json({ message: "User already exist!" });
+
+    // create user
+
+    const user = await User.create({
+      userName,
+      email: email.toLowerCase(),
+      password,
+      loggedIn: false,
+    });
+
+    res.status(201).json({
+      message: "User registered",
+      user: { id: user._id, email: user.email, username: user.userName },
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Internal server error", err });
+  }
+};
+
+export { registerUser };
+```
 
 ### req flow
 
 ![alt text](image-1.png)
+
+### HTTP methods
+
+- used for communications amongts the compuers
+- used by browsers Postman curl etc to req and send data.
+
+```bash
+ex:
+  https://example.com/api/users
+
+https: protocol
+//example.com : domain name
+/api/users : path => tell the server which resource you are asking for.
+
+```
+![alt text](image-2.png)
+
+### https status code
+
+![alt text](image-3.png)
+

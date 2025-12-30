@@ -8,6 +8,7 @@ dotenv.config({
   path: "./.env",
 });
 
+const port = 4000;
 
 const startServer = async () => {
   try {
@@ -17,8 +18,8 @@ const startServer = async () => {
       console.log("Error", err);
       throw err;
     });
-    app.listen(process.env.PORT || 4000, () => {
-      console.log("Server running at port : ", process.env.PORT);
+    app.listen(process.env.PORT || port, () => {
+      console.log("Server running at port : ", process.env.PORT || port);
     });
   } catch (err) {
     console.log("MongoDb connection error", err);

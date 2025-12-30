@@ -8,7 +8,7 @@ import userRouter from "./routes/user.route.js";
 
 // routes declaration
 
-app.use("api/v1/users", userRouter);
+app.use("/api/v1/users", userRouter);
 
 // ex: http://localhost:3001/api/v1/users/register
 
