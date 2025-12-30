@@ -247,3 +247,33 @@ https: protocol
 ### https status code
 
 ![alt text](image-3.png)
+
+### loginuser
+
+```js
+const loginUser = async (req, res) => {
+  try {
+
+    const { email, password } = req.body;
+    // check user already exist
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) return res.status(404).json({ message: "User does not exist" });
+    // checking validation
+    
+    return res.status(200).json({ message: "user logged in successfully" });
+
+  } catch (error) {
+    console.log("Error in user login : ", error);
+    return res.status(501).json({ message: "Error in user login" });
+  }
+};
+
+
+```
+
+
+### bcrypt
+
+it is used to hash password and compare password

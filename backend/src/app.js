@@ -10,6 +10,8 @@ import userRouter from "./routes/user.route.js";
 
 app.use("/api/v1/users", userRouter);
 
+
+
 // ex: http://localhost:3001/api/v1/users/register
 
 export default app;
