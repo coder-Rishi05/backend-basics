@@ -149,26 +149,26 @@ import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
   {
-    userName: {
-      type: "String",
+    username: {
+      type: String,
       required: true,
       unique: true,
-      lowerCase: true,
+      lowercase: true,
       trim: true, //
       minLength: 3,
       maxLength: 30,
     },
     password: {
-      type: "String",
+      type: String,
       required: true,
       minLength: 6,
       maxLength: 30,
     },
     email: {
-      type: "String",
+      type: String,
       required: true,
       unique: true,
-      lowerCase: true,
+      lowercase: true,
       trim: true, //
     },
   },
@@ -182,35 +182,22 @@ export const User = mongoose.model("User", userSchema);
 
 ```js
 // user.routes.js
-import { Router } from "express";
-import { registerUser } from "../controllers/user.controller";
-const router = Router();
 
-router.route("/register").post(registerUser);
-
-export default router;
-```
-
-### Controller
-
-they are the decision makers handle requests
-
-```js
 import { User } from "../models/user.model.js";
 
 const registerUser = async (req, res) => {
   try {
-    const { userName, email, password } = req.body;
+    const { username, email, password } = req.body;
 
     // basic validation
 
-    if (!userName || !email || !password) {
+    if (!username || !email || !password) {
       return res.status(400).json({ message: "All the feild are mandatory !" });
     }
 
     // if user already exist
 
-    const existingUser = User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
 
     if (existingUser)
       return res.status(400).json({ message: "User already exist!" });
@@ -218,7 +205,7 @@ const registerUser = async (req, res) => {
     // create user
 
     const user = await User.create({
-      userName,
+      username,
       email: email.toLowerCase(),
       password,
       loggedIn: false,
@@ -226,7 +213,7 @@ const registerUser = async (req, res) => {
 
     res.status(201).json({
       message: "User registered",
-      user: { id: user._id, email: user.email, username: user.userName },
+      user: { id: user._id, email: user.email, username: user.username },
     });
   } catch (err) {
     res.status(500).json({ message: "Internal server error", err });
@@ -254,9 +241,9 @@ https: protocol
 /api/users : path => tell the server which resource you are asking for.
 
 ```
+
 ![alt text](image-2.png)
 
 ### https status code
 
 ![alt text](image-3.png)
-
