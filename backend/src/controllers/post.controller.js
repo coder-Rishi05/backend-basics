@@ -52,7 +52,7 @@ const getAllpost = async (req, res) => {
 
 // update post
 
-const updatePost = async (req,res) => {
+const updatePost = async (req, res) => {
   //   const { name, description, age } = req.body;
   // basic validation
   try {
@@ -76,4 +76,19 @@ const updatePost = async (req,res) => {
   }
 };
 
-export { createPost, getAllpost, updatePost };
+const deletePost = async (req, res) => {
+  try {
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) return res.status(404).json({ message: "post not found !" });
+
+    return res.status(200).json({ message: "Post deleted sucessfully", post });
+  } catch (error) {
+    console.log(err);
+    return res.status(500).json({
+      message: "Server Error",
+      error,
+    });
+  }
+};
+
+export { createPost, getAllpost, updatePost, deletePost };
