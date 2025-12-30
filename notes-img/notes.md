@@ -518,19 +518,112 @@ const postSchema = new Schema(
       type: Number,
       required: true,
       trim: true,
-      min:1,
-      max:150,
+      min: 1,
+      max: 150,
     },
   },
   { timestamps: true }
 );
 
 export const Post = mongoose.model("Post", postSchema);
-
 ```
 
 - post.controller.js
 
+### creating a post
 
+```js
+import { Post } from "../models/post.model.js";
 
+// create a Post
 
+const createPost = async (req, res) => {
+  try {
+    // getting data from user
+    const { name, description, age } = req.body;
+
+    // checking empty feilds
+
+    if (!name || !description || !age)
+      return res.status(400).json({
+        message: "All feilds are necessary !",
+      });
+
+    // creating post
+
+    const post = await Post.create({
+      name,
+      description,
+      age,
+    });
+
+    res.status(201).json({
+      message: "Post created sucessfully",
+      post: {
+        name: post.name,
+        description: post.description,
+        age: post.age,
+      },
+    });
+  } catch (error) {
+    console.log("Server error !");
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export { createPost };
+```
+
+post.route.js
+
+```js
+import { Router } from "express";
+
+import { createPost, getAllpost } from "../controllers/post.controller.js";
+
+const router = Router();
+
+router.route("/create").post(createPost);
+
+export default router;
+```
+
+- using post in app.js
+
+```js
+import express from "express";
+const app = express();
+
+app.use(express.json());
+// routes import
+
+import userRouter from "./routes/user.route.js";
+
+import postRouter from "./routes/post.route.js";
+
+// routes declaration
+
+app.use("/api/v1/users", userRouter);
+
+app.use("/api/v1/post", postRouter);
+
+// ex: http://localhost:3001/api/v1/users/register
+
+export default app;
+```
+
+### get all post
+
+```js
+const getAllpost = async (req, res) => {
+  try {
+    const posts = await Post.find();
+    return res.status(200).json({ message: "Fetched all posts", posts });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server Error",
+      error,
+    });
+  }
+};
+```

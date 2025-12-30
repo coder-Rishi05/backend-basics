@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
-
+// name, description, age
 const postSchema = new Schema(
   {
-    username: {
+    name: {
       type: String,
       required: true,
       trim: true,

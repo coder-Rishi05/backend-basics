@@ -6,9 +6,14 @@ app.use(express.json());
 
 import userRouter from "./routes/user.route.js";
 
+import postRouter from "./routes/post.route.js"
+
+
 // routes declaration
 
 app.use("/api/v1/users", userRouter);
+
+app.use("/api/v1/post", postRouter);
 
 
 
